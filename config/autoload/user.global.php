@@ -23,6 +23,7 @@
 // //MYSQL
 return array(
    'db' => array(
+   'hostname' => 'grupobinario.sytes.net',
    'driver'   => 'PDO_Mysql',
    'database' => 'queryme',
    'user'     => 'root',

@@ -34,15 +34,15 @@ class ResultadosMapper
     $this->adapter = $adapter;
   }
 
-  public function getResultados($empresa, $encuesta) { 
+  public function getResultados($empresa, $encuesta) {
  $json = '{
 	"success": true,
 	"data": [{
 		"os": "Si",
-		"data1": 68.3
+		"data1": 67.3
 	}, {
 		"os": "Pocas veces",
-		"data1": 1.7
+		"data1": 2.7
 	}, {
 		"os": "No",
 		"data1": 17.9
@@ -53,18 +53,18 @@ class ResultadosMapper
 //select count(res.respuesta)as cantidad, res.respuesta from resultados res where res.idpregunta =  0 and empresa =1 and encuesta =1 group by res.respuesta,res.idpregunta;
 	return $json;
   }
-  
-  public function putResultados($empresa, $encuesta, $data) {   
+
+  public function putResultados($empresa, $encuesta, $data) {
 //print_r($data);die;
-    foreach ($data as $c => $v){      
+    foreach ($data as $c => $v){
       $id_preg   = substr ( $c, 5);
-      $respuesta = $v;           
-      
+      $respuesta = $v;
+
       // obtengo el prox. nro encuestado
       $r2 = $this->adapter->query("SELECT MAX(encuestado)+1 AS proximo FROM resultados", Adapter::QUERY_MODE_EXECUTE)or die("{ \"success\": false, \"msg\": \"Error Al conectar a la DB.\"}");
       $last = $r2->toArray();
       $encuestado = $last[0]['proximo'];
-      
+
       try {
         $dataInsert = array(
           "idpregunta" => $id_preg,
@@ -80,20 +80,20 @@ class ResultadosMapper
         $insert->values($dataInsert);
         $insertString = $sql->getSqlStringForSqlObject($insert);
         //echo $insertString; die;
-        $results = $this->adapter->query($insertString, Adapter::QUERY_MODE_EXECUTE);        
-        
+        $results = $this->adapter->query($insertString, Adapter::QUERY_MODE_EXECUTE);
+
       } catch (Exception $e) {
         $json = new stdClass();
         $json->success = false;
         $json->msg = "No se pudo ingresar el resultado.";
         return $json;
       }
-      
+
     }
     $json = new stdClass();
     $json->success = true;
     $json->msg     = "Respuestas grabadas correctamente.";
     return $json;
-    
+
   }
 }
