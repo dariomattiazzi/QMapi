@@ -60,7 +60,13 @@ class ResultadosResource extends AbstractResourceListener
      */
     public function fetch($id)
     {
-        return new ApiProblem(405, 'The GET method has not been defined for individual resources');
+        //return new ApiProblem(405, 'The GET method has not been defined for individual resources');
+        $headers = apache_request_headers ();
+        $empresa = $headers['empresa'];
+        $encuesta = $headers['encuesta'];
+		$id_pregunta = $id;
+
+        return $this->mapper->getResultados($empresa, $encuesta, $id_pregunta);
     }
 
     /**
@@ -72,11 +78,7 @@ class ResultadosResource extends AbstractResourceListener
     public function fetchAll($params = [])
     {
         //return new ApiProblem(405, 'The GET method has not been defined for collections');
-         $headers = apache_request_headers ();
-         $empresa = 1;
-         $encuesta = 1;
-//print_r('flo');die;
-        return $this->mapper->getResultados($empresa, $encuesta);
+
     }
 
     /**

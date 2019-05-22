@@ -34,74 +34,62 @@ class ResultadosMapper
     $this->adapter = $adapter;
   }
 
-  public function getResultados($empresa, $encuesta) {
-//  $json = '{
-// 	"success": true,
-// 	"data": [{
-// 		"os": "Si",
-// 		"data1": 67.3
-// 	}, {
-// 		"os": "Pocas veces",
-// 		"data1": 2.7
-// 	}, {
-// 		"os": "No",
-// 		"data1": 17.9
-// 	}]
-// }';
+  public function getResultados($empresa, $encuesta, $id_pregunta) {
 
-//select count(idpregunta) from resultados where empresa =1 and encuesta =1 and idpregunta = 0;
-//select count(res.respuesta)as cantidad, res.respuesta from resultados res where res.idpregunta =  0 and empresa =1 and encuesta =1 group by res.respuesta,res.idpregunta;
-
-$id_pregunta = 0;
-
-$query = "SELECT
+    $query = "SELECT
     queryme.resultados.idpregunta,
     queryme.preguntas.texto,
     queryme.resultados.respuesta,
     queryme.opciones.valorOpcion
-FROM
+    FROM
     queryme.resultados
-INNER JOIN queryme.preguntas ON  (queryme.resultados.idpregunta = queryme.preguntas.idpreguntas)
-INNER JOIN queryme.opciones ON (queryme.resultados.idpregunta = queryme.opciones.idpregunta)
-WHERE
+    INNER JOIN queryme.preguntas ON  (queryme.resultados.idpregunta = queryme.preguntas.idpreguntas)
+    INNER JOIN queryme.opciones ON (queryme.resultados.idpregunta = queryme.opciones.idpregunta)
+    WHERE
     queryme.preguntas.tipo = 'selectfield'
-AND queryme.resultados.respuesta = queryme.opciones.idopcion
-AND queryme.resultados.idpregunta = $id_pregunta
-ORDER BY queryme.resultados.idpregunta;";
+    AND queryme.resultados.respuesta = queryme.opciones.idopcion
+    AND queryme.resultados.idpregunta = $id_pregunta
+    ORDER BY queryme.resultados.idpregunta;";
 
-$sql2 = new Sql($this->adapter);
-$results  = $this->adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
-$resultados = $results->toArray();
+    $sql2 = new Sql($this->adapter);
+    $results  = $this->adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
+    $resultados = $results->toArray();
 
-//print_r($resultados); die;
+    //print_r($resultados); die;
 
-foreach ($resultados as $key => $value) {
-  $arr_respXpreg[$value['respuesta']][] = $value;
-}
+    foreach ($resultados as $key => $value) {
+      $arr_respXpreg[$value['respuesta']][] = $value;
+    }
 
-$tot_respuestas = count($resultados);
+    $tot_respuestas = count($resultados);
 
-foreach ($arr_respXpreg as $key => $value) {
-  $porciento = count($arr_respXpreg[$key]);
+    foreach ($arr_respXpreg as $key => $value) {
+      $porciento = count($arr_respXpreg[$key]);
 
-//  echo $tot_respuestas . " - " . $porciento; die;
-  $porcentaje = number_format($porciento*100/$tot_respuestas , 2);
+      //  echo $tot_respuestas . " - " . $porciento; die;
+      $porcentaje = number_format($porciento*100/$tot_respuestas , 2);
 
-  $tot_respuestas_por_preg[$key]['totalpreg']   = $porciento;
-  $tot_respuestas_por_preg[$key]['data1']  = $porcentaje;
-  $tot_respuestas_por_preg[$key]['os'] = $value['0']['valorOpcion'];
-}
+      /*  $tot_respuestas_por_preg[$key]['totalpreg']   = $porciento;
+      $tot_respuestas_por_preg[$key]['data1']  = $porcentaje;
+      $tot_respuestas_por_preg[$key]['os'] = $value['0']['valorOpcion'];
+      */
+      $t['totalpreg'] = $porciento;
+      $t['data1']     = $porcentaje;
+      $t['os']        = $value['0']['valorOpcion'];
 
-//echo "\n".$tot_respuestas_por_preg."\n";
-//print_r($tot_respuestas_por_preg); die;
-  $json->success = true;
-  $json->items   = $tot_respuestas_por_preg;
-  return $json;
+      $tot_respuestas_por_preg[]= $t;
+    }
+
+    //echo "\n".$tot_respuestas_por_preg."\n";
+    //print_r($tot_respuestas_por_preg); die;
+    $json->success = true;
+    $json->items   = $tot_respuestas_por_preg;
+    return $json;
 
   }
 
   public function putResultados($empresa, $encuesta, $data) {
-//print_r($data);die;
+    //print_r($data);die;
     foreach ($data as $c => $v){
       $id_preg   = substr ( $c, 5);
       $respuesta = $v;

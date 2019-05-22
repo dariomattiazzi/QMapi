@@ -65,7 +65,7 @@ class OpcionesResource extends AbstractResourceListener
     public function fetchAll($params = [])
     {
         //return new ApiProblem(405, 'The GET method has not been defined for collections');
-	$headers = apache_request_headers ();
+	    $headers = apache_request_headers ();
       $empresa = $headers['empresa'];
       $encuesta = $headers['encuesta'];
       return $this->mapper->getOpciones($empresa, $encuesta);

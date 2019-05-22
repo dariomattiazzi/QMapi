@@ -20,7 +20,8 @@ class PanelesResource extends AbstractResourceListener
      */
     public function create($data)
     {
-        return new ApiProblem(405, 'The POST method has not been defined');
+        //return new ApiProblem(405, 'The POST method has not been defined');
+        return $this->mapper->GraboPaneles($data);
     }
 
     /**

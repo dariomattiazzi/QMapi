@@ -44,10 +44,67 @@ class PanelesMapper
 		));
 		$selectString = $sql2->getSqlStringForSqlObject($select);
 		$results  = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
-		$paneles = $results->toArray();		
+		$paneles = $results->toArray();
 
 		$json->success = true;
 		$json->items   = $paneles;
+		return $json;
+	}
+
+	public function GraboPaneles($data) {
+		if ( $data->update == 'true') {
+			// echo "ACTUALIZA";
+			return $this->actualizaGraboPaneles($data);
+		}else {
+			// echo "CREA";
+			return $this->creaGraboPaneles($data);
+		}
+	}
+
+	public function creaGraboPaneles($data)
+	{
+		$query = "SELECT max(idpanel) + 1 as idpanel FROM paneles";
+		$sql2 = new Sql($this->adapter);
+		$results  = $this->adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
+		$idpanel = $results->toArray();
+		$idpanel = $idpanel['0']['idpanel'];
+		try {
+			$dataInsert = array(
+				"idpanel" => $idpanel,
+				"texto" => $data->texto
+			);
+			$sql = new Sql($this->adapter);
+			$insert = $sql->insert();
+			$insert->into('paneles');
+			$insert->values($dataInsert);
+			$insertString = $sql->getSqlStringForSqlObject($insert);
+			$results = $this->adapter->query($insertString, Adapter::QUERY_MODE_EXECUTE);
+			$json = new stdClass();
+			$json->success = true;
+			return $json;
+		} catch (Exception $e) {
+			$json = new stdClass();
+			$json->success = false;
+			$json->msg = "No se pudo ingresar el panel.";
+			return $json;
+		}
+	}
+
+	public function actualizaGraboPaneles($data)
+	{
+		$idpanel = $data->idpanel;
+		$texto = $data->texto;
+		$sql = new Sql($this->adapter);
+		$update = $sql->update();
+		$update->table('paneles');
+		$update->set(array(
+			"texto"   => $texto
+		));
+		$update->where->equalTo("idpanel", $idpanel);
+		$updateString = $sql->getSqlStringForSqlObject($update);
+		$this->adapter->query($updateString, Adapter::QUERY_MODE_EXECUTE);
+		$json = new stdClass();
+		$json->success = true;
 		return $json;
 	}
 }
