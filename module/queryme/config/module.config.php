@@ -104,6 +104,7 @@ return [
             'collection_http_methods' => [
                 0 => 'GET',
                 1 => 'POST',
+                2 => 'DELETE',
             ],
             'collection_query_whitelist' => [],
             'page_size' => 25,

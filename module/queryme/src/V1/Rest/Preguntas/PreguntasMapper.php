@@ -51,6 +51,22 @@ class PreguntasMapper
 		return $json;
 	}
 
+	public function getPregXPanel($idpanel) {
+		$sql2 = new Sql($this->adapter);
+		$select = $sql2->select();
+		$select->from('preguntas');
+		$select->where(array(
+			'idpanel'  => $idpanel
+		));
+		$selectString = $sql2->getSqlStringForSqlObject($select);
+		$results  = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
+		$preguntas = $results->toArray();
+
+		$json->success = true;
+		$json->items   = $preguntas;
+		return $json;
+	}
+
 	public function GraboPreguntas($data) {
 		if ( $data->update == 'true') {
 			// echo "ACTUALIZA";
@@ -111,7 +127,7 @@ class PreguntasMapper
 		$update->set(array(
 			"idpanel" => $idpanel,
 			"tipo"    => $tipo,
- 			"texto"   => $texto
+			"texto"   => $texto
 		));
 		$update->where->equalTo("idpreguntas", $idpregunta);
 		$updateString = $sql->getSqlStringForSqlObject($update);

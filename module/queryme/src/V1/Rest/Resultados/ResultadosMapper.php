@@ -36,56 +36,105 @@ class ResultadosMapper
 
   public function getResultados($empresa, $encuesta, $id_pregunta) {
 
-    $query = "SELECT
-    queryme.resultados.idpregunta,
-    queryme.preguntas.texto,
-    queryme.resultados.respuesta,
-    queryme.opciones.valorOpcion
-    FROM
-    queryme.resultados
-    INNER JOIN queryme.preguntas ON  (queryme.resultados.idpregunta = queryme.preguntas.idpreguntas)
-    INNER JOIN queryme.opciones ON (queryme.resultados.idpregunta = queryme.opciones.idpregunta)
-    WHERE
-    queryme.preguntas.tipo = 'selectfield'
-    AND queryme.resultados.respuesta = queryme.opciones.idopcion
-    AND queryme.resultados.idpregunta = $id_pregunta
-    ORDER BY queryme.resultados.idpregunta;";
-
     $sql2 = new Sql($this->adapter);
-    $results  = $this->adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
-    $resultados = $results->toArray();
+    $select = $sql2->select();
+    $select->from('preguntas');
+    $select->where(array(
+      'empresa'     => $empresa,
+      'encuesta'    => $encuesta,
+      'idpreguntas' => $id_pregunta,
 
-    //print_r($resultados); die;
+    ));
+    $selectString = $sql2->getSqlStringForSqlObject($select);
+    $results  = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
+    $pregunta = $results->toArray();
 
-    foreach ($resultados as $key => $value) {
-      $arr_respXpreg[$value['respuesta']][] = $value;
+    $tipo = $pregunta['0']['tipo'];
+
+
+    switch ($tipo) {
+      case 'selectfield':
+      $query = "SELECT
+      queryme.resultados.idpregunta,
+      queryme.preguntas.texto,
+      queryme.resultados.respuesta,
+      queryme.opciones.valorOpcion
+      FROM
+      queryme.resultados
+      INNER JOIN queryme.preguntas ON  (queryme.resultados.idpregunta = queryme.preguntas.idpreguntas)
+      INNER JOIN queryme.opciones ON (queryme.resultados.idpregunta = queryme.opciones.idpregunta)
+      WHERE
+      queryme.preguntas.tipo = 'selectfield'
+      AND queryme.resultados.respuesta = queryme.opciones.idopcion
+      AND queryme.resultados.idpregunta = $id_pregunta
+      ORDER BY queryme.resultados.idpregunta;";
+
+      $sql2 = new Sql($this->adapter);
+      $results  = $this->adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
+      $resultados = $results->toArray();
+
+      //print_r($resultados); die;
+
+      foreach ($resultados as $key => $value) {
+        $arr_respXpreg[$value['respuesta']][] = $value;
+      }
+
+      $tot_respuestas = count($resultados);
+
+      foreach ($arr_respXpreg as $key => $value) {
+        $porciento = count($arr_respXpreg[$key]);
+
+        //  echo $tot_respuestas . " - " . $porciento; die;
+        $porcentaje = number_format($porciento*100/$tot_respuestas , 2);
+
+        /*  $tot_respuestas_por_preg[$key]['totalpreg']   = $porciento;
+        $tot_respuestas_por_preg[$key]['data1']  = $porcentaje;
+        $tot_respuestas_por_preg[$key]['os'] = $value['0']['valorOpcion'];
+        */
+        $t['totalpreg'] = $porciento;
+        $t['data1']     = $porcentaje;
+        $t['os']        = $value['0']['valorOpcion'];
+
+        $tot_respuestas_por_preg[]= $t;
+      }
+
+      //echo "\n".$tot_respuestas_por_preg."\n";
+      //print_r($tot_respuestas_por_preg); die;
+      $json->success = true;
+      $json->data   = $tot_respuestas_por_preg;
+      return $json;
+      break;
+      case 'textfield':
+      $query = "SELECT
+      queryme.resultados.idpregunta,
+      queryme.preguntas.texto,
+      queryme.resultados.respuesta
+      FROM
+      queryme.resultados
+      INNER JOIN queryme.preguntas ON  (queryme.resultados.idpregunta = queryme.preguntas.idpreguntas)
+      WHERE queryme.preguntas.tipo = 'textfield'
+      AND queryme.resultados.idpregunta = $id_pregunta
+      ORDER BY queryme.resultados.idpregunta;";
+      $sql2 = new Sql($this->adapter);
+      $results  = $this->adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
+      $resultados = $results->toArray();
+
+      $i = 0;
+      foreach ($resultados as $key => $value) {
+        $i++;
+        $tot_respuestas_por_preg[$i] = $value['respuesta'];
+      }
+
+      $json->success = true;
+      $json->data   = $tot_respuestas_por_preg;
+      return $json;
+      break;
+      default:
+      $json->success = true;
+      $json->data   = "tipo de pregunta incorrecto";
+      return $json;
+
     }
-
-    $tot_respuestas = count($resultados);
-
-    foreach ($arr_respXpreg as $key => $value) {
-      $porciento = count($arr_respXpreg[$key]);
-
-      //  echo $tot_respuestas . " - " . $porciento; die;
-      $porcentaje = number_format($porciento*100/$tot_respuestas , 2);
-
-      /*  $tot_respuestas_por_preg[$key]['totalpreg']   = $porciento;
-      $tot_respuestas_por_preg[$key]['data1']  = $porcentaje;
-      $tot_respuestas_por_preg[$key]['os'] = $value['0']['valorOpcion'];
-      */
-      $t['totalpreg'] = $porciento;
-      $t['data1']     = $porcentaje;
-      $t['os']        = $value['0']['valorOpcion'];
-
-      $tot_respuestas_por_preg[]= $t;
-    }
-
-    //echo "\n".$tot_respuestas_por_preg."\n";
-    //print_r($tot_respuestas_por_preg); die;
-    $json->success = true;
-    $json->items   = $tot_respuestas_por_preg;
-    return $json;
-
   }
 
   public function putResultados($empresa, $encuesta, $data) {

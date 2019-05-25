@@ -34,23 +34,118 @@ class OpcionesMapper
 		$this->adapter = $adapter;
 	}
 	public function getData($oppr){
- //print_r($oppr);
-	  $data ="";
-	 	foreach($oppr as $val){
-	  
-	 	 if ($val == end($oppr)){
-	 	 $data .= "{ value".$oppr[0][idpregunta].": ".$val[idopcion].", display".$oppr[0][idpregunta].": '".$val[valorOpcion]."'}";
-	  	}else{
-	   	 $data .= "{ value".$oppr[0][idpregunta].": ".$val[idopcion].", display".$oppr[0][idpregunta].": '".$val[valorOpcion]."'},";
-		 }						
-	 	}
-//die;
-		return $data;
+		//print_r($oppr);
+		$data ="";
+		foreach($oppr as $val){
 
+			if ($val == end($oppr)){
+				$data .= "{ value".$oppr[0][idpregunta].": ".$val[idopcion].", display".$oppr[0][idpregunta].": '".$val[valorOpcion]."'}";
+			}else{
+				$data .= "{ value".$oppr[0][idpregunta].": ".$val[idopcion].", display".$oppr[0][idpregunta].": '".$val[valorOpcion]."'},";
+			}
+		}
+		//die;
+		return $data;
 	}
+
+	public function getOpciobesXPreg($id_pregunta) {
+		$sql2 = new Sql($this->adapter);
+		$select = $sql2->select();
+		$select->from('opciones');
+		$select->where(array(
+			'idpregunta'  => $id_pregunta
+		));
+		$selectString = $sql2->getSqlStringForSqlObject($select);
+		$results  = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
+		$opciones = $results->toArray();
+
+		$json->success = true;
+		$json->items   = $opciones;
+		return $json;
+	}
+
+	public function GraboOpciones($data) {
+		if ( $data->update == 'true') {
+			return $this->actualizaGraboOpciones($data);
+		}else {
+			return $this->creaGraboOpciones($data);
+		}
+	}
+
+	public function creaGraboOpciones($data)
+	{
+		$query = "SELECT max(idopciones) + 1 as idopciones FROM opciones";
+		$sql2  = new Sql($this->adapter);
+		$results     = $this->adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
+		$idopciones  = $results->toArray();
+		$idopciones  = $idopciones['0']['idopciones'];
+
+		$query = "SELECT max(idopcion) + 1 as idopcion FROM opciones WHERE idpregunta = $data->idpregunta";
+		$sql2  = new Sql($this->adapter);
+		$results   = $this->adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
+		$idopcion  = $results->toArray();
+		$idopcion  = $idopcion['0']['idopcion'];
+
+		$headers = apache_request_headers ();
+		$empresa = $headers['empresa'];
+		$encuesta = $headers['encuesta'];
+
+		try {
+			$dataInsert = array(
+				"idopciones" => $idopciones,
+				"idpregunta" => $data->idpregunta,
+				"idopcion"   => $idopcion,
+				"valorOpcion"     => $data->valorOpcion,
+				"empresa"     => $empresa,
+				"encuesta"    => $encuesta
+			);
+			//{ "update":false,"idpregunta":"0", "valorOpcion":"La sala", "empresa": 1, "encuesta": 1 }
+			$sql = new Sql($this->adapter);
+			$insert = $sql->insert();
+			$insert->into('opciones');
+			$insert->values($dataInsert);
+			$insertString = $sql->getSqlStringForSqlObject($insert);
+			$results = $this->adapter->query($insertString, Adapter::QUERY_MODE_EXECUTE);
+			$json = new stdClass();
+			$json->success = true;
+			return $json;
+		} catch (Exception $e) {
+			$json = new stdClass();
+			$json->success = false;
+			$json->msg = "No se pudo ingresar la Opcion.";
+			return $json;
+		}
+	}
+
+	public function actualizaGraboOpciones($data)
+	{
+
+		$headers = apache_request_headers ();
+		$empresa = $headers['empresa'];
+		$encuesta = $headers['encuesta'];
+
+		$dataUpdate = array(
+			"idpregunta"  => $data->idpregunta,
+			"valorOpcion" => $data->valorOpcion,
+			"empresa"     => $empresa,
+			"encuesta"    => $encuesta
+		);
+
+		$sql = new Sql($this->adapter);
+		$update = $sql->update();
+		$update->table('opciones');
+		$update->set($dataUpdate);
+		$update->where->equalTo("idopciones", $data->idopciones);
+		$updateString = $sql->getSqlStringForSqlObject($update);
+		$this->adapter->query($updateString, Adapter::QUERY_MODE_EXECUTE);
+		$json = new stdClass();
+		$json->success = true;
+		return $json;
+	}
+
 	public function getOpciones($empresa, $encuesta) {
 
-	$string= "";
+		$string= "";
 		$sql2 = new Sql($this->adapter);
 		$select = $sql2->select();
 		$select->from('opciones');
@@ -60,50 +155,50 @@ class OpcionesMapper
 		));
 		//$select->group('idpregunta);
 		$selectString = $sql2->getSqlStringForSqlObject($select);
-		
+
 		$selectString = $selectString ." group by idpregunta";
 		//print_r($selectString);die;
 		$results  = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
 		$opciones = $results->toArray();
 		//print_r($opciones );die;
 		foreach($opciones as $op){
-		
+
 			$sql2 = new Sql($this->adapter);
 			$select = $sql2->select();
 			$select->from('opciones');
 			$select->where(array(
-			'empresa'  => 1,
-			'encuesta' => 1,
-			'idpregunta' =>$op[idpregunta]
+				'empresa'  => 1,
+				'encuesta' => 1,
+				'idpregunta' =>$op[idpregunta]
 			));
-		
+
 			$selectString = $sql2->getSqlStringForSqlObject($select);
 			//$selectString = $selectString ." group by'idpregunta','idopcion";
 			//print_r($selectString);die;
 
 			$results  = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
 			$oppr = $results->toArray();
-			$string .= "Ext.define('Query.store.store".$oppr[0][idpregunta]."', { 
+			$string .= "Ext.define('Query.store.store".$oppr[0][idpregunta]."', {
 				extend: 'Ext.data.Store',
 				alias: 'store.store".$oppr[0][idpregunta]."',
 				storeId:'store".$oppr[0][idpregunta]."',
-   		 		fields: [
-     		   			'value".$oppr[0][idpregunta]."', 'display".$oppr[0][idpregunta]."'
-    				],
-    				autoLoad:false,
+				fields: [
+					'value".$oppr[0][idpregunta]."', 'display".$oppr[0][idpregunta]."'
+				],
+				autoLoad:false,
 
-  		  		data: { items: [ ". $this->getData($oppr)."]}    ,
+				data: { items: [ ". $this->getData($oppr)."]}    ,
 				proxy: {
-        	  			type: 'memory',
-        				reader: {
-            				type: 'json',
-           		 		rootProperty: 'items'
-        				}
-   				}
-	       		 });
+					type: 'memory',
+					reader: {
+						type: 'json',
+						rootProperty: 'items'
+					}
+				}
+			});
 			Ext.create('Query.store.store".$oppr[0][idpregunta]."');";
-	
-	}
+
+		}
 		print_r($string);die;
 	}
 }

@@ -25,6 +25,8 @@ use Zend\Db\TableGateway\TableGateway;
 use stdClass;
 //use queryme\V1\Rest\OAuthAccess;
 use Zend\Db\Sql\Predicate\IsNull;
+use Zend\Http\Response;
+use Zend\Http\Response\Stream;
 
 class PanelesMapper
 {
@@ -52,6 +54,11 @@ class PanelesMapper
 	}
 
 	public function GraboPaneles($data) {
+		if ( $data->delete == 'true') {
+			return $this->borrarPaneles($data);
+		}else{
+
+		}
 		if ( $data->update == 'true') {
 			// echo "ACTUALIZA";
 			return $this->actualizaGraboPaneles($data);
@@ -59,6 +66,7 @@ class PanelesMapper
 			// echo "CREA";
 			return $this->creaGraboPaneles($data);
 		}
+
 	}
 
 	public function creaGraboPaneles($data)
@@ -106,5 +114,50 @@ class PanelesMapper
 		$json = new stdClass();
 		$json->success = true;
 		return $json;
+	}
+
+	public function borrarPaneles($data)
+	{
+		$id = $data->idpanel;
+		try {
+			$sql = new Sql($this->adapter);
+			$select = $sql->select();
+			$select->from('paneles');
+			$select->where('idpanel = '.$id);
+			$selectString = $sql->getSqlStringForSqlObject($select);
+
+			$results = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
+			$panel = $results->toArray();
+
+			if (!empty($panel)) {
+				$sql = new Sql($this->adapter);
+				$delete = $sql->delete();
+				$delete->from('paneles');
+				$delete->where(array(
+					'idpanel' => $id
+				));
+				$deleteString = $sql->getSqlStringForSqlObject($delete);
+
+				$results = $this->adapter->query($deleteString, Adapter::QUERY_MODE_EXECUTE);
+				$oResponse = new Response();
+				$response = new stdClass;
+				$response->success = true;
+				$response->msg = "Panel eliminado.";
+				$oResponse->setContent(json_encode($response));
+				return $oResponse;
+			}else{
+				$oResponse = new Response();
+				$response = new stdClass;
+				$response->success = false;
+				$response->msg = "El panel no puede ser eliminado.";
+				$oResponse->setContent(json_encode($response));
+				return $oResponse;
+			}
+		} catch (Exception $e) {
+			$json = new stdClass();
+			$json->success = false;
+			$json->msg = "No se pudo eliminar el panel.";
+			return $json;
+		}
 	}
 }
