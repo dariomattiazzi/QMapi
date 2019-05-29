@@ -93,6 +93,10 @@ class PreguntasMapper
 		$idpanel     = $results->toArray();
 		$id_pregunta = $idpanel['0']['idpregunta'];
 
+		if (empty($id_pregunta)) {
+			$id_pregunta = 0;
+		}
+
 		$headers = apache_request_headers ();
 		$empresa = $headers['empresa'];
 		$encuesta = $headers['encuesta'];

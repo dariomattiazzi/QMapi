@@ -78,6 +78,11 @@ class PanelesMapper
 		$results  = $this->adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
 		$idpanel = $results->toArray();
 		$idpanel = $idpanel['0']['idpanel'];
+
+		if (empty($idpanel)) {
+			$idpanel = 0;
+		}
+		
 		try {
 			$dataInsert = array(
 				"idpanel"  => $idpanel,

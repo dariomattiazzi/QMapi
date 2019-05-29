@@ -94,7 +94,8 @@ class ResultadosMapper
       //echo "\n".$tot_respuestas_por_preg."\n";
       //print_r($tot_respuestas_por_preg); die;
       $json->success = true;
-      $json->data   = $tot_respuestas_por_preg;
+      $json->type    = "cerrada";
+      $json->data    = $tot_respuestas_por_preg;
       return $json;
       break;
       case 'textfield':
@@ -119,6 +120,7 @@ class ResultadosMapper
       }
 
       $json->success = true;
+      $json->type = "abierta";
       $json->data   = $tot_respuestas_por_preg;
       return $json;
       break;
@@ -138,6 +140,10 @@ class ResultadosMapper
       $r2 = $this->adapter->query("SELECT MAX(encuestado)+1 AS proximo FROM resultados", Adapter::QUERY_MODE_EXECUTE)or die("{ \"success\": false, \"msg\": \"Error Al conectar a la DB.\"}");
       $last = $r2->toArray();
       $encuestado = $last[0]['proximo'];
+
+      if (empty($encuestado)) {
+  			$encuestado = 0;
+  		}
 
       try {
         $dataInsert = array(

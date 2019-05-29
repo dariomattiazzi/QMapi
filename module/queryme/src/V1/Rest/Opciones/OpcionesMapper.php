@@ -95,11 +95,19 @@ class OpcionesMapper
 		$idopciones  = $results->toArray();
 		$idopciones  = $idopciones['0']['idopciones'];
 
+		if (empty($idopciones)) {
+			$idopciones = 0;
+		}
+
 		$query = "SELECT max(idopcion) + 1 as idopcion FROM opciones WHERE idpregunta = $data->idpregunta";
 		$sql2  = new Sql($this->adapter);
 		$results   = $this->adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
 		$idopcion  = $results->toArray();
 		$idopcion  = $idopcion['0']['idopcion'];
+
+		if (empty($idopcion)) {
+			$idopcion = 0;
+		}
 
 		$headers = apache_request_headers ();
 		$empresa = $headers['empresa'];
