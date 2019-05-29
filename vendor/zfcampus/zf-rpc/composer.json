@@ -1,0 +1,67 @@
+{
+    "name": "zfcampus/zf-rpc",
+    "description": "ZF2 Module for simplifying the creation of RPC services",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "zendframework",
+        "zf",
+        "zend",
+        "module",
+        "rpc"
+    ],
+    "support": {
+        "issues": "https://github.com/zfcampus/zf-rpc/issues",
+        "source": "https://github.com/zfcampus/zf-rpc",
+        "rss": "https://github.com/zfcampus/zf-rpc/releases.atom",
+        "chat": "https://zendframework-slack.herokuapp.com",
+        "forum": "https://discourse.zendframework.com/c/questions/apigility"
+    },
+    "require": {
+        "php": "^5.6 || ^7.0",
+        "zendframework/zend-eventmanager": "^2.6.3 || ^3.0.1",
+        "zendframework/zend-http": "^2.5.4",
+        "zendframework/zend-mvc": "^2.7.15 || ^3.0.2",
+        "zendframework/zend-servicemanager": "^2.7.6 || ^3.1",
+        "zendframework/zend-stdlib": "^2.7.7 || ^3.0.1",
+        "zendframework/zend-view": "^2.8.1",
+        "zfcampus/zf-api-problem": "^1.2.1",
+        "zfcampus/zf-content-negotiation": "^1.2.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.7.27 || ^6.5.8 || ^7.1.5",
+        "zendframework/zend-coding-standard": "~1.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "ZF\\Rpc\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ZFTest\\Rpc\\": "test/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.4.x-dev",
+            "dev-develop": "1.5.x-dev"
+        },
+        "zf": {
+            "module": "ZF\\Rpc"
+        }
+    },
+    "scripts": {
+        "check": [
+            "@cs-check",
+            "@test"
+        ],
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf",
+        "test": "phpunit --colors=always",
+        "test-coverage": "phpunit --colors=always --coverage-clover clover.xml"
+    },
+    "homepage": "http://apigility.org/"
+}

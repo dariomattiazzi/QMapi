@@ -25,6 +25,9 @@ use Zend\Db\TableGateway\TableGateway;
 use stdClass;
 //use queryme\V1\Rest\OAuthAccess;
 use Zend\Db\Sql\Predicate\IsNull;
+use Zend\Http\Response;
+use Zend\Http\Response\Stream;
+
 
 class OpcionesMapper
 {
@@ -59,12 +62,24 @@ class OpcionesMapper
 		$results  = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
 		$opciones = $results->toArray();
 
-		$json->success = true;
-		$json->items   = $opciones;
-		return $json;
+		if(!empty($opciones)){
+			$json->success = true;
+			$json->items   = $opciones;
+			return $json;
+		}else{
+			$json->success = true;
+			$json->msg = "La pregunta no tiene opciones.";
+			return $json;
+		}
 	}
 
 	public function GraboOpciones($data) {
+		if ( $data->delete == 'true') {
+			//BORRA OPCION
+			return $this->borrarOpcion($data);
+		}
+
+
 		if ( $data->update == 'true') {
 			return $this->actualizaGraboOpciones($data);
 		}else {
@@ -200,5 +215,49 @@ class OpcionesMapper
 
 		}
 		print_r($string);die;
+	}
+
+	public function borrarOpcion($data)
+	{
+		$id = $data->idopcion;
+
+		try {
+			$sql = new Sql($this->adapter);
+			$select = $sql->select();
+			$select->from('opciones');
+			$select->where('idopciones = '.$id);
+			$selectString = $sql->getSqlStringForSqlObject($select);
+			$results = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
+			$opcion = $results->toArray();
+
+			if (!empty($opcion)) {
+				$sql = new Sql($this->adapter);
+				$delete = $sql->delete();
+				$delete->from('opciones');
+				$delete->where(array(
+					'idopciones' => $id
+				));
+				$deleteString = $sql->getSqlStringForSqlObject($delete);
+				$results = $this->adapter->query($deleteString, Adapter::QUERY_MODE_EXECUTE);
+				$oResponse = new Response();
+				$response = new stdClass;
+				$response->success = true;
+				$response->msg = "Opcion eliminada.";
+				$oResponse->setContent(json_encode($response));
+				return $oResponse;
+			}else{
+				$oResponse = new Response();
+				$response = new stdClass;
+				$response->success = false;
+				$response->msg = "La opcion no puede ser eliminada.";
+				$oResponse->setContent(json_encode($response));
+				return $oResponse;
+			}
+		} catch (Exception $e) {
+			$json = new stdClass();
+			$json->success = false;
+			$json->msg = "No se pudo eliminar la opcion.";
+			return $json;
+		}
 	}
 }

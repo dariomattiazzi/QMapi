@@ -44,6 +44,7 @@ class PanelesMapper
 			'empresa'  => $empresa,
 			'encuesta' => $encuesta,
 		));
+		$select->order('idpanel ASC');
 		$selectString = $sql2->getSqlStringForSqlObject($select);
 		$results  = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
 		$paneles = $results->toArray();
@@ -56,8 +57,6 @@ class PanelesMapper
 	public function GraboPaneles($data) {
 		if ( $data->delete == 'true') {
 			return $this->borrarPaneles($data);
-		}else{
-
 		}
 		if ( $data->update == 'true') {
 			// echo "ACTUALIZA";
@@ -71,6 +70,11 @@ class PanelesMapper
 
 	public function creaGraboPaneles($data)
 	{
+		$headers = apache_request_headers ();
+
+    $empresa = $headers['empresa'];
+    $encuesta = $headers['encuesta'];
+
 		$query = "SELECT max(idpanel) + 1 as idpanel FROM paneles";
 		$sql2 = new Sql($this->adapter);
 		$results  = $this->adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
@@ -78,8 +82,10 @@ class PanelesMapper
 		$idpanel = $idpanel['0']['idpanel'];
 		try {
 			$dataInsert = array(
-				"idpanel" => $idpanel,
-				"texto" => $data->texto
+				"idpanel"  => $idpanel,
+				"texto"    => $data->texto,
+				"empresa"  => $empresa,
+				"encuesta" => $encuesta
 			);
 			$sql = new Sql($this->adapter);
 			$insert = $sql->insert();

@@ -25,6 +25,8 @@ use Zend\Db\TableGateway\TableGateway;
 use stdClass;
 //use queryme\V1\Rest\OAuthAccess;
 use Zend\Db\Sql\Predicate\IsNull;
+use Zend\Http\Response;
+use Zend\Http\Response\Stream;
 
 class PreguntasMapper
 {
@@ -35,6 +37,7 @@ class PreguntasMapper
 	}
 
 	public function getPreguntas($empresa, $encuesta) {
+
 		$sql2 = new Sql($this->adapter);
 		$select = $sql2->select();
 		$select->from('preguntas');
@@ -68,6 +71,11 @@ class PreguntasMapper
 	}
 
 	public function GraboPreguntas($data) {
+		if ( $data->delete == 'true') {
+			//BORRA PREGUNTA
+			return $this->borrarPregunta($data);
+		}
+
 		if ( $data->update == 'true') {
 			// echo "ACTUALIZA";
 			return $this->actualizaGraboPreguntas($data);
@@ -135,5 +143,48 @@ class PreguntasMapper
 		$json = new stdClass();
 		$json->success = true;
 		return $json;
+	}
+
+	public function borrarPregunta($data)
+	{
+		$id = $data->idpregunta;
+		try {
+			$sql = new Sql($this->adapter);
+			$select = $sql->select();
+			$select->from('preguntas');
+			$select->where('idpreguntas = '.$id);
+			$selectString = $sql->getSqlStringForSqlObject($select);
+			$results = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
+			$pregunta = $results->toArray();
+
+			if (!empty($pregunta)) {
+				$sql = new Sql($this->adapter);
+				$delete = $sql->delete();
+				$delete->from('preguntas');
+				$delete->where(array(
+					'idpreguntas' => $id
+				));
+				$deleteString = $sql->getSqlStringForSqlObject($delete);
+				$results = $this->adapter->query($deleteString, Adapter::QUERY_MODE_EXECUTE);
+				$oResponse = new Response();
+				$response = new stdClass;
+				$response->success = true;
+				$response->msg = "Pregunta eliminada.";
+				$oResponse->setContent(json_encode($response));
+				return $oResponse;
+			}else{
+				$oResponse = new Response();
+				$response = new stdClass;
+				$response->success = false;
+				$response->msg = "La pregunta no puede ser eliminada.";
+				$oResponse->setContent(json_encode($response));
+				return $oResponse;
+			}
+		} catch (Exception $e) {
+			$json = new stdClass();
+			$json->success = false;
+			$json->msg = "No se pudo eliminar la pregunta.";
+			return $json;
+		}
 	}
 }

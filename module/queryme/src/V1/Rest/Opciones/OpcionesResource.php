@@ -54,8 +54,8 @@ class OpcionesResource extends AbstractResourceListener
   */
   public function fetch($id)
   {
-    // return new ApiProblem(405, 'The GET method has not been defined for individual resources');
-    return $this->mapper->getOpciobesXPreg($id);
+    return new ApiProblem(405, 'The GET method has not been defined for individual resources');
+
   }
 
   /**
@@ -70,8 +70,23 @@ class OpcionesResource extends AbstractResourceListener
     $headers = apache_request_headers ();
     $empresa = $headers['empresa'];
     $encuesta = $headers['encuesta'];
-    return $this->mapper->getOpciones($empresa, $encuesta);
 
+	$numero = count($_GET);
+	$tags = array_keys($_GET);		 // obtiene los nombres de las varibles
+	$valores = array_values($_GET);	 // obtiene los valores de las varibles
+	$headers = apache_request_headers ();
+
+	// crea las variables y les asigna el valor
+	for ($i = 0; $i < $numero; $i ++) {
+		$arr[$tags[$i]] = $valores[$i];
+	}
+
+	if(!empty($arr['idpregunta'])){
+	$id = $arr['idpregunta'];
+		return $this->mapper->getOpciobesXPreg($id);
+	}else{
+		return $this->mapper->getOpciones($empresa, $encuesta);
+	}
   }
 
   /**
