@@ -65,17 +65,15 @@ class PanelesMapper
 			// echo "CREA";
 			return $this->creaGraboPaneles($data);
 		}
-
 	}
 
 	public function creaGraboPaneles($data)
 	{
 		$headers = apache_request_headers ();
-
     $empresa = $headers['empresa'];
     $encuesta = $headers['encuesta'];
 
-		$query = "SELECT max(idpanel) + 1 as idpanel FROM paneles";
+		$query = "SELECT max(idpanel) + 1 as idpanel FROM paneles WHERE idpanel < 99999";
 		$sql2 = new Sql($this->adapter);
 		$results  = $this->adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
 		$idpanel = $results->toArray();

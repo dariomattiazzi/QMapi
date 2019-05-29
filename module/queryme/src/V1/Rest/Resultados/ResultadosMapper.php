@@ -42,15 +42,13 @@ class ResultadosMapper
     $select->where(array(
       'empresa'     => $empresa,
       'encuesta'    => $encuesta,
-      'idpreguntas' => $id_pregunta,
-
+      'idpreguntas' => $id_pregunta
     ));
     $selectString = $sql2->getSqlStringForSqlObject($select);
     $results  = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
     $pregunta = $results->toArray();
 
     $tipo = $pregunta['0']['tipo'];
-
 
     switch ($tipo) {
       case 'selectfield':
@@ -72,7 +70,6 @@ class ResultadosMapper
       $sql2 = new Sql($this->adapter);
       $results  = $this->adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
       $resultados = $results->toArray();
-
       //print_r($resultados); die;
 
       foreach ($resultados as $key => $value) {
@@ -87,10 +84,6 @@ class ResultadosMapper
         //  echo $tot_respuestas . " - " . $porciento; die;
         $porcentaje = number_format($porciento*100/$tot_respuestas , 2);
 
-        /*  $tot_respuestas_por_preg[$key]['totalpreg']   = $porciento;
-        $tot_respuestas_por_preg[$key]['data1']  = $porcentaje;
-        $tot_respuestas_por_preg[$key]['os'] = $value['0']['valorOpcion'];
-        */
         $t['totalpreg'] = $porciento;
         $t['data1']     = $porcentaje;
         $t['os']        = $value['0']['valorOpcion'];
@@ -122,7 +115,7 @@ class ResultadosMapper
       $i = 0;
       foreach ($resultados as $key => $value) {
         $i++;
-        $tot_respuestas_por_preg[$i] = $value['respuesta'];
+        $tot_respuestas_por_preg[] = array("id" => "$i", "respuesta" => $value['respuesta']);
       }
 
       $json->success = true;
@@ -133,12 +126,10 @@ class ResultadosMapper
       $json->success = true;
       $json->data   = "tipo de pregunta incorrecto";
       return $json;
-
     }
   }
 
   public function putResultados($empresa, $encuesta, $data) {
-    //print_r($data);die;
     foreach ($data as $c => $v){
       $id_preg   = substr ( $c, 5);
       $respuesta = $v;
@@ -162,7 +153,6 @@ class ResultadosMapper
         $insert->into('resultados');
         $insert->values($dataInsert);
         $insertString = $sql->getSqlStringForSqlObject($insert);
-        //echo $insertString; die;
         $results = $this->adapter->query($insertString, Adapter::QUERY_MODE_EXECUTE);
 
       } catch (Exception $e) {
@@ -172,7 +162,6 @@ class ResultadosMapper
         $json->msg = "No se pudo ingresar el resultado.";
         return $json;
       }
-
     }
     $json = new stdClass();
     $json->success = true;
