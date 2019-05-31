@@ -99,7 +99,7 @@ class OpcionesMapper
 			$idopciones = 0;
 		}
 
-		$query = "SELECT max(idopcion) + 1 as idopcion FROM opciones WHERE idpregunta = $data->idpregunta";
+		$query = "SELECT max(idopcion) + 1 as idopcion FROM opciones WHERE idpregunta = $data->idpreguntas";
 		$sql2  = new Sql($this->adapter);
 		$results   = $this->adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
 		$idopcion  = $results->toArray();
@@ -116,7 +116,7 @@ class OpcionesMapper
 		try {
 			$dataInsert = array(
 				"idopciones" => $idopciones,
-				"idpregunta" => $data->idpregunta,
+				"idpregunta" => $data->idpreguntas,
 				"idopcion"   => $idopcion,
 				"valorOpcion"     => $data->valorOpcion,
 				"empresa"     => $empresa,
@@ -148,7 +148,7 @@ class OpcionesMapper
 		$encuesta = $headers['encuesta'];
 
 		$dataUpdate = array(
-			"idpregunta"  => $data->idpregunta,
+			"idpregunta"  => $data->idpreguntas,
 			"valorOpcion" => $data->valorOpcion,
 			"empresa"     => $empresa,
 			"encuesta"    => $encuesta

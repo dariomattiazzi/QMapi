@@ -47,10 +47,24 @@ class PanelesMapper
 		$select->order('idpanel ASC');
 		$selectString = $sql2->getSqlStringForSqlObject($select);
 		$results  = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
-		$paneles = $results->toArray();
+		$paneles_tmp = $results->toArray();
+		$i=0;
+
+		foreach ($paneles_tmp as $key => $value) {
+				//				echo $key."\n"; print_r($paneles_tmp); die;
+				if($value['idpanel']== 99999){$i=99999;}
+				$paneles['idpanel'] = $value['idpanel'];
+                                $paneles['orden']   = $i;
+				$paneles['texto']   = $value['texto'];
+				$paneles['empresa'] = $value['empresa'];
+				$paneles['encuesta'] = $value['encuesta'];
+				$pp[] = $paneles;
+				$i++;
+		}
+
 
 		$json->success = true;
-		$json->items   = $paneles;
+		$json->items   = $pp;
 		return $json;
 	}
 
@@ -82,7 +96,7 @@ class PanelesMapper
 		if (empty($idpanel)) {
 			$idpanel = 0;
 		}
-		
+
 		try {
 			$dataInsert = array(
 				"idpanel"  => $idpanel,

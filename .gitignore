@@ -3,6 +3,3 @@ config/development.config.php
 data/cache/*
 !data/cache/.gitkeep
 phpunit.xml
-config/autoload/user.global.php
-config/autoload/local.php
-config/autoload/user.global.php

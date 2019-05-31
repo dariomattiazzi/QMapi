@@ -81,8 +81,8 @@ class OpcionesResource extends AbstractResourceListener
 		$arr[$tags[$i]] = $valores[$i];
 	}
 
-	if(!empty($arr['idpregunta'])){
-	$id = $arr['idpregunta'];
+	if(!empty($arr['idpreguntas'])){
+	$id = $arr['idpreguntas'];
 		return $this->mapper->getOpciobesXPreg($id);
 	}else{
 		return $this->mapper->getOpciones($empresa, $encuesta);
