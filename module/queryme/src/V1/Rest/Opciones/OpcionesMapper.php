@@ -37,14 +37,14 @@ class OpcionesMapper
 		$this->adapter = $adapter;
 	}
 	public function getData($oppr){
-		//print_r($oppr);
+		// print_r($oppr); die;
 		$data ="";
 		foreach($oppr as $val){
 
 			if ($val == end($oppr)){
-				$data .= "{ value".$oppr[0][idpregunta].": ".$val[idopcion].", display".$oppr[0][idpregunta].": '".$val[valorOpcion]."'}";
+				$data .= "{ value".$oppr['0']['idpregunta'].": ".$val['idopcion'].", display".$oppr['0']['idpregunta'].": '".$val['valorOpcion'].", habilita".$oppr['0']['idpregunta'].": '".$val['habilita_idpanel']."'}";
 			}else{
-				$data .= "{ value".$oppr[0][idpregunta].": ".$val[idopcion].", display".$oppr[0][idpregunta].": '".$val[valorOpcion]."'},";
+				$data .= "{ value".$oppr['0']['idpregunta'].": ".$val['idopcion'].", display".$oppr['0']['idpregunta'].": '".$val['valorOpcion'].", habilita".$oppr['0']['idpregunta'].": '".$val['habilita_idpanel']."'},";
 			}
 		}
 		//die;
@@ -130,7 +130,8 @@ class OpcionesMapper
 			$insertString = $sql->getSqlStringForSqlObject($insert);
 			$results = $this->adapter->query($insertString, Adapter::QUERY_MODE_EXECUTE);
 			$json = new stdClass();
-			$json->success = true;
+			$json->success   = true;
+			$json->id_opcion = $results->getGeneratedValue();
 			return $json;
 		} catch (Exception $e) {
 			$json = new stdClass();
@@ -190,13 +191,16 @@ class OpcionesMapper
 			$select = $sql2->select();
 			$select->from('opciones');
 			$select->where(array(
-				'empresa'  => 1,
-				'encuesta' => 1,
-				'idpregunta' =>$op[idpregunta]
+				'empresa'          => $op['empresa'],
+				'encuesta'         => $op['encuesta'],
+				//'idpregunta'       =>$op['idpregunta'],
+//				'habilita_idpanel' =>$op['habilita_idpanel'],
+
 			));
 
 			$selectString = $sql2->getSqlStringForSqlObject($select);
 			//$selectString = $selectString ." group by'idpregunta','idopcion";
+			// die("$selectString");
 			//print_r($selectString);die;
 
 			$results  = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
@@ -206,7 +210,7 @@ class OpcionesMapper
 				alias: 'store.store".$oppr[0][idpregunta]."',
 				storeId:'store".$oppr[0][idpregunta]."',
 				fields: [
-					'value".$oppr[0][idpregunta]."', 'display".$oppr[0][idpregunta]."'
+					'value".$oppr['0']['idpregunta']."', 'display".$oppr['0']['idpregunta']."', 'habilita".$oppr['0']['idpregunta']."'
 				],
 				autoLoad:false,
 

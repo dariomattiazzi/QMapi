@@ -53,8 +53,9 @@ class PanelesMapper
 		foreach ($paneles_tmp as $key => $value) {
 				//				echo $key."\n"; print_r($paneles_tmp); die;
 				if($value['idpanel']== 99999){$i=99999;}
+				$i = ($value['idpanel'] == 99999) ? $i=99999 : "";
 				$paneles['idpanel'] = $value['idpanel'];
-                                $paneles['orden']   = $i;
+        $paneles['orden']   = $i;
 				$paneles['texto']   = $value['texto'];
 				$paneles['empresa'] = $value['empresa'];
 				$paneles['encuesta'] = $value['encuesta'];
@@ -87,7 +88,7 @@ class PanelesMapper
     $empresa = $headers['empresa'];
     $encuesta = $headers['encuesta'];
 
-		$query = "SELECT max(idpanel) + 1 as idpanel FROM paneles WHERE idpanel < 99999";
+		$query = "SELECT max(idpanel) + 1 as idpanel FROM paneles WHERE idpanel < 4000";
 		$sql2 = new Sql($this->adapter);
 		$results  = $this->adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
 		$idpanel = $results->toArray();
@@ -97,6 +98,14 @@ class PanelesMapper
 			$idpanel = 0;
 		}
 
+		if (isset($data->idopcion) && !empty($data->idopcion)) {
+			$query = "SELECT max(idpanel) + 1 as idpanel FROM paneles WHERE idpanel >= 4000 AND idpanel < 9000";
+			$sql2 = new Sql($this->adapter);
+			$results  = $this->adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
+			$idpanel = $results->toArray();
+			$idpanel = $idpanel['0']['idpanel'];
+		}
+
 		try {
 			$dataInsert = array(
 				"idpanel"  => $idpanel,
@@ -104,12 +113,31 @@ class PanelesMapper
 				"empresa"  => $empresa,
 				"encuesta" => $encuesta
 			);
+
 			$sql = new Sql($this->adapter);
 			$insert = $sql->insert();
 			$insert->into('paneles');
 			$insert->values($dataInsert);
 			$insertString = $sql->getSqlStringForSqlObject($insert);
 			$results = $this->adapter->query($insertString, Adapter::QUERY_MODE_EXECUTE);
+
+			if (isset($data->idopcion) && !empty($data->idopcion)) {
+				$panel_idopcion = $data->idopcion;
+
+				$dataUpdate = array(
+					"habilita_idpanel"  => $idpanel,
+				);
+
+				$sql = new Sql($this->adapter);
+				$update = $sql->update();
+				$update->table('opciones');
+				$update->set($dataUpdate);
+				$update->where->equalTo("idopciones", $panel_idopcion);
+				$updateString = $sql->getSqlStringForSqlObject($update);
+				$this->adapter->query($updateString, Adapter::QUERY_MODE_EXECUTE);
+
+			}
+
 			$json = new stdClass();
 			$json->success = true;
 			return $json;
