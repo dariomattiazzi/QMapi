@@ -190,6 +190,21 @@ class PanelesMapper
 				$deleteString = $sql->getSqlStringForSqlObject($delete);
 
 				$results = $this->adapter->query($deleteString, Adapter::QUERY_MODE_EXECUTE);
+
+				if ($id >= 4000) {
+					$dataUpdate = array(
+						"habilita_idpanel"  => null
+					);
+
+					$sql = new Sql($this->adapter);
+					$update = $sql->update();
+					$update->table('opciones');
+					$update->set($dataUpdate);
+					$update->where->equalTo("habilita_idpanel", $id);
+					$updateString = $sql->getSqlStringForSqlObject($update);
+					$this->adapter->query($updateString, Adapter::QUERY_MODE_EXECUTE);
+				}
+
 				$oResponse = new Response();
 				$response = new stdClass;
 				$response->success = true;
