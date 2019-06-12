@@ -65,14 +65,11 @@ class PanelesMapper
 			//$i = ($value['idpanel'] == 99999) ? $i=99999 : "";
 			$paneles['idpanel'] = $value['idpanel'];
 
-			$paneles['texto']   = $value['texto'];
-			$paneles['empresa'] = $value['empresa'];
+			$paneles['texto']    = $value['texto'];
+			$paneles['empresa']  = $value['empresa'];
 			$paneles['encuesta'] = $value['encuesta'];
 			$pp[] = $paneles;
-
 		}
-
-
 		$json->success = true;
 		$json->items   = $pp;
 		return $json;

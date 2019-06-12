@@ -127,10 +127,10 @@ class OpcionesMapper
 
 				try {
 					$dataInsert = array(
-						"idopciones" => $idopciones,
-						"idpregunta" => $data->idpreguntas,
-						"idopcion"   => $idopcion,
-						"valorOpcion"     => $data->valorOpcion,
+						"idopciones"  => $idopciones,
+						"idpregunta"  => $data->idpreguntas,
+						"idopcion"    => $idopcion,
+						"valorOpcion" => $data->valorOpcion,
 						"empresa"     => $empresa,
 						"encuesta"    => $encuesta
 					);
@@ -155,7 +155,6 @@ class OpcionesMapper
 
 			public function actualizaGraboOpciones($data)
 			{
-
 				$headers = apache_request_headers ();
 				$empresa = $headers['empresa'];
 				$encuesta = $headers['encuesta'];
@@ -217,10 +216,10 @@ class OpcionesMapper
 
 					$results  = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
 					$oppr = $results->toArray();
-					$string .= "Ext.define('Query.store.store".$oppr[0][idpregunta]."', {
+					$string .= "Ext.define('Query.store.store".$oppr['0']['idpregunta']."', {
 						extend: 'Ext.data.Store',
-						alias: 'store.store".$oppr[0][idpregunta]."',
-						storeId:'store".$oppr[0][idpregunta]."',
+						alias: 'store.store".$oppr['0']['idpregunta']."',
+						storeId:'store".$oppr['0']['idpregunta']."',
 						fields: [
 							'value".$oppr['0']['idpregunta']."', 'display".$oppr['0']['idpregunta']."', 'habilita".$oppr['0']['idpregunta']."'
 						],
@@ -235,7 +234,7 @@ class OpcionesMapper
 							}
 						}
 					});
-					Ext.create('Query.store.store".$oppr[0][idpregunta]."');";
+					Ext.create('Query.store.store".$oppr['0']['idpregunta']."');";
 
 				}
 				print_r($string);die;
