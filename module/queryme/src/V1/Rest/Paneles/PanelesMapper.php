@@ -51,16 +51,25 @@ class PanelesMapper
 		$i=0;
 
 		foreach ($paneles_tmp as $key => $value) {
-				//				echo $key."\n"; print_r($paneles_tmp); die;
-				if($value['idpanel']== 99999){$i=99999;}
-				$i = ($value['idpanel'] == 99999) ? $i=99999 : "";
-				$paneles['idpanel'] = $value['idpanel'];
-        $paneles['orden']   = $i;
-				$paneles['texto']   = $value['texto'];
-				$paneles['empresa'] = $value['empresa'];
-				$paneles['encuesta'] = $value['encuesta'];
-				$pp[] = $paneles;
+			//echo $key."\n"; print_r($paneles_tmp); die;
+			if($value['idpanel']== 99999){
+				$i=99999;
+				$paneles['orden']   = $i;
+			}else if($value['idpanel'] > 4000){
+				$i=$value['idpanel'] ;
+				$paneles['orden']   = $i;
+			}else{
+				$paneles['orden']   = $i;
 				$i++;
+			}
+			//$i = ($value['idpanel'] == 99999) ? $i=99999 : "";
+			$paneles['idpanel'] = $value['idpanel'];
+
+			$paneles['texto']   = $value['texto'];
+			$paneles['empresa'] = $value['empresa'];
+			$paneles['encuesta'] = $value['encuesta'];
+			$pp[] = $paneles;
+
 		}
 
 
@@ -85,8 +94,8 @@ class PanelesMapper
 	public function creaGraboPaneles($data)
 	{
 		$headers = apache_request_headers ();
-    $empresa = $headers['empresa'];
-    $encuesta = $headers['encuesta'];
+		$empresa = $headers['empresa'];
+		$encuesta = $headers['encuesta'];
 
 		$query = "SELECT max(idpanel) + 1 as idpanel FROM paneles WHERE idpanel < 4000";
 		$sql2 = new Sql($this->adapter);
