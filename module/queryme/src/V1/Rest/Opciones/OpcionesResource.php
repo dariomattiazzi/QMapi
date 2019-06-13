@@ -71,22 +71,24 @@ class OpcionesResource extends AbstractResourceListener
     $empresa = $headers['empresa'];
     $encuesta = $headers['encuesta'];
 
-	$numero = count($_GET);
-	$tags = array_keys($_GET);		 // obtiene los nombres de las varibles
-	$valores = array_values($_GET);	 // obtiene los valores de las varibles
-	$headers = apache_request_headers ();
+    $numero = count($_GET);
+    $tags = array_keys($_GET);	 // obtiene los nombres de las varibles
+    $valores = array_values($_GET);	 // obtiene los valores de las varibles
+    $headers = apache_request_headers ();
 
-	// crea las variables y les asigna el valor
-	for ($i = 0; $i < $numero; $i ++) {
-		$arr[$tags[$i]] = $valores[$i];
-	}
+    // crea las variables y les asigna el valor
+    for ($i = 0; $i < $numero; $i ++) {
+	$arr[$tags[$i]] = $valores[$i];
+    }
 
-	if(!empty($arr['idpreguntas'])){
-	$id = $arr['idpreguntas'];
-		return $this->mapper->getOpciobesXPreg($id);
-	}else{
-		return $this->mapper->getOpciones($empresa, $encuesta);
-	}
+//print_r($arr); die;
+
+    if(!empty($arr['idpreguntas'])){ 
+        $id = $arr['idpreguntas'];
+	return $this->mapper->getOpciobesXPreg($id);
+    }else{
+	return $this->mapper->getOpciones($empresa, $encuesta);
+    }
   }
 
   /**

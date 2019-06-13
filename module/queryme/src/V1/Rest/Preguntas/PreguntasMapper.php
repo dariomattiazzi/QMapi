@@ -94,7 +94,7 @@ class PreguntasMapper
 		$id_pregunta = $idpanel['0']['idpregunta'];
 
 		if (empty($id_pregunta)) {
-			$id_pregunta = 0;
+			$id_pregunta = 1;
 		}
 
 		$headers = apache_request_headers ();

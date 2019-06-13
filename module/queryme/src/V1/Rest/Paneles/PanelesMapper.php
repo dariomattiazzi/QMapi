@@ -109,7 +109,12 @@ class PanelesMapper
 			$sql2 = new Sql($this->adapter);
 			$results  = $this->adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
 			$idpanel = $results->toArray();
+
 			$idpanel = $idpanel['0']['idpanel'];
+			
+			if(empty($idpanel)){
+				$idpanel = 4000;
+			}
 		}
 
 		try {
