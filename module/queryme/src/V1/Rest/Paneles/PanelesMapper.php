@@ -55,7 +55,7 @@ class PanelesMapper
 			if($value['idpanel']== 99999){
 				$i=99999;
 				$paneles['orden']   = $i;
-			}else if($value['idpanel'] > 4000){
+			}else if($value['idpanel'] >= 4000){
 				$i=$value['idpanel'] ;
 				$paneles['orden']   = $i;
 			}else{
@@ -111,7 +111,7 @@ class PanelesMapper
 			$idpanel = $results->toArray();
 
 			$idpanel = $idpanel['0']['idpanel'];
-			
+
 			if(empty($idpanel)){
 				$idpanel = 4000;
 			}
