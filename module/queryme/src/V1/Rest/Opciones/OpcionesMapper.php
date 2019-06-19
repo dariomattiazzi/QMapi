@@ -237,7 +237,10 @@ class OpcionesMapper
 					Ext.create('Query.store.store".$oppr['0']['idpregunta']."');";
 
 				}
-				print_r($string);die;
+				print_r($string);
+				$response = new stdClass;
+        $response->success= true;
+        return $response;
 			}
 
 			public function borrarOpcion($data)
