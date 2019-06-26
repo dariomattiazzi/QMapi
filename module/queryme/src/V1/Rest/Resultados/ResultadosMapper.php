@@ -149,7 +149,7 @@ class ResultadosMapper
         $dataInsert = array(
           "idpregunta" => $id_preg,
           "respuesta"  => $respuesta,
-          'fecha'      => date("d-m-y H:i:s"),
+          'fecha'      => date("y-m-d H:i:s"),
           "encuestado" => $encuestado,
           "empresa"    => $empresa,
           "encuesta"   => $encuesta,
