@@ -35,9 +35,9 @@ class PreguntasMapper
 	{
 		$this->adapter = $adapter;
 	}
-	
+
 	public function getPreguntas($empresa, $encuesta) {
-		
+
 		$sql2 = new Sql($this->adapter);
 		$select = $sql2->select();
 		$select->from('preguntas');
@@ -49,9 +49,9 @@ class PreguntasMapper
 		$selectString = $sql2->getSqlStringForSqlObject($select);
 		$results  = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
 		$preguntas = $results->toArray();
-		
-		foreach($preguntas as $key => $row) {			
-			$panel = $this->buscoPanel($row ['idpanel']); 					
+
+		foreach($preguntas as $key => $row) {
+			$panel = $this->buscoPanel($row ['idpanel']);
 			$arr_preg[] = array(
 				'idpanel' => $row ['idpanel'],
 				'encuesta' => $row ['encuesta'],
@@ -63,14 +63,29 @@ class PreguntasMapper
 				'estado' => $row ['estado'],
 				'paneltexto' => $panel,
 			);
-			
-		}		
-		
+
+		}
+
+		//obtiene el total de encuestados
+		$sql2 = new Sql($this->adapter);
+		$select = $sql2->select();
+		$select->from('resultados');
+		$select->where(array(
+			'resultados.empresa'  => $empresa,
+			'resultados.encuesta' => $encuesta,
+		));
+		$selectString = $sql2->getSqlStringForSqlObject($select);
+		$results  = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
+		$encuestados = $results->toArray();
+
+		$cantidadEncuestados = count($encuestados);
+
 		$json->success = true;
+		$json->cantidadEncuestados = $cantidadEncuestados;
 		$json->items   = $arr_preg;
 		return $json;
 	}
-	
+
 	function buscoPanel($idpanel)
 	{
 		$sql = new Sql($this->adapter);
@@ -80,7 +95,7 @@ class PreguntasMapper
 		$selectString = $sql->getSqlStringForSqlObject($select);
 		$results = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
 		$p = $results->toArray();
-		
+
 		if (!empty($p[0]['texto'])) {
 			$panel = $p[0]['texto'];
 			return $panel;
@@ -99,18 +114,18 @@ class PreguntasMapper
 		$selectString = $sql2->getSqlStringForSqlObject($select);
 		$results  = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
 		$preguntas = $results->toArray();
-		
+
 		$json->success = true;
 		$json->items   = $preguntas;
 		return $json;
 	}
-	
+
 	public function GraboPreguntas($data) {
 		if ( $data->delete == 'true') {
 			//BORRA PREGUNTA
 			return $this->borrarPregunta($data);
 		}
-		
+
 		if ( $data->update == 'true') {
 			// echo "ACTUALIZA";
 			return $this->actualizaGraboPreguntas($data);
@@ -119,7 +134,7 @@ class PreguntasMapper
 			return $this->creaGraboPreguntas($data);
 		}
 	}
-	
+
 	public function creaGraboPreguntas($data)
 	{
 		$query       = "SELECT max(idpreguntas) + 1 as idpregunta FROM preguntas";
@@ -127,15 +142,15 @@ class PreguntasMapper
 		$results     = $this->adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
 		$idpanel     = $results->toArray();
 		$id_pregunta = $idpanel['0']['idpregunta'];
-		
+
 		if (empty($id_pregunta)) {
 			$id_pregunta = 1;
 		}
-		
+
 		$headers = apache_request_headers ();
 		$empresa = $headers['empresa'];
 		$encuesta = $headers['encuesta'];
-		
+
 		try {
 			$dataInsert = array(
 				"idpreguntas" => $id_pregunta,
@@ -161,7 +176,7 @@ class PreguntasMapper
 			return $json;
 		}
 	}
-	
+
 	public function actualizaGraboPreguntas($data)
 	{
 		$idpregunta = $data->idpreguntas;
@@ -183,7 +198,7 @@ class PreguntasMapper
 		$json->success = true;
 		return $json;
 	}
-	
+
 	public function borrarPregunta($data)
 	{
 		$id = $data->idpregunta;
@@ -195,7 +210,7 @@ class PreguntasMapper
 			$selectString = $sql->getSqlStringForSqlObject($select);
 			$results = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
 			$pregunta = $results->toArray();
-			
+
 			if (!empty($pregunta)) {
 				$sql = new Sql($this->adapter);
 				$delete = $sql->delete();
