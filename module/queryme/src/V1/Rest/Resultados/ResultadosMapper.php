@@ -117,12 +117,12 @@ class ResultadosMapper
 
       $i = 0;
       $total_respuestas = count($resultados);
-      $tot_respuestas_por_preg['totalpreg'] = $total_respuestas;
+      //$tot_respuestas_por_preg['totalpreg'] = $total_respuestas;
 
       foreach ($resultados as $key => $value) {
         if (!empty($value['respuesta'])) {
           $i++;
-          $tot_respuestas_por_preg[] = array("id" => "$i", "respuesta" => $value['respuesta']);
+          $tot_respuestas_por_preg[] = array("id" => "$i", "respuesta" => $value['respuesta'], "totalpreg" => $total_respuestas);
         }
       }
 
