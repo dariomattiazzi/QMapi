@@ -7,8 +7,8 @@ return [
                     'adapter' => \ZF\MvcAuth\Authentication\OAuth2Adapter::class,
                     'storage' => [
                         'adapter' => \pdo::class,
-                        'dsn' => 'mysql:host=localhost;dbname=queryme;',
-                        // 'dsn' => 'mysql:host=grupobinario.sytes.net;dbname=queryme;',
+                        //'dsn' => 'mysql:host=localhost;dbname=queryme;',
+                        'dsn' => 'mysql:host=grupobinario.sytes.net;dbname=queryme;',
                         'route' => '/oauth',
                         'username' => 'root',
                         'password' => 'frutill4s',

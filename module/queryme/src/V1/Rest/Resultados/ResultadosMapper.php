@@ -100,26 +100,17 @@ class ResultadosMapper
       break;
 
       case 'textfield':
-      // $query = "SELECT
-      // queryme.resultados.idpregunta,
-      // queryme.preguntas.texto,
-      // queryme.resultados.respuesta
-      // FROM
-      // queryme.resultados
-      // INNER JOIN queryme.preguntas ON  (queryme.resultados.idpregunta = queryme.preguntas.idpreguntas)
-      // WHERE queryme.preguntas.tipo = 'textfield'
-      // AND queryme.resultados.idpregunta = $id_pregunta
-      // ORDER BY queryme.resultados.idpregunta;";
       $query = "SELECT
-            pruebaQM.resultados.idpregunta,
-            pruebaQM.preguntas.texto,
-            pruebaQM.resultados.respuesta
-            FROM
-            pruebaQM.resultados
-            INNER JOIN pruebaQM.preguntas ON  (pruebaQM.resultados.idpregunta = pruebaQM.preguntas.idpreguntas)
-            WHERE pruebaQM.preguntas.tipo = 'textfield'
-            AND pruebaQM.resultados.idpregunta = $id_pregunta
-            ORDER BY pruebaQM.resultados.idpregunta;";
+      queryme.resultados.idpregunta,
+      queryme.preguntas.texto,
+      queryme.resultados.respuesta
+      FROM
+      queryme.resultados
+      INNER JOIN queryme.preguntas ON  (queryme.resultados.idpregunta = queryme.preguntas.idpreguntas)
+      WHERE queryme.preguntas.tipo = 'textfield'
+      AND queryme.resultados.idpregunta = $id_pregunta
+      ORDER BY queryme.resultados.idpregunta;";
+
       $sql2 = new Sql($this->adapter);
       $results  = $this->adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
       $resultados = $results->toArray();

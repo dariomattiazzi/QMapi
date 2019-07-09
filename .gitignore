@@ -6,3 +6,5 @@ phpunit.xml
 config/autoload/user.global.php
 config/autoload/local.php
 config/autoload/local.php
+config/autoload/user.global.php
+config/autoload/local.php
