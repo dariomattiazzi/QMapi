@@ -66,7 +66,7 @@ class PreguntasMapper
 
 		}
 
-		//obtiene el total de encuestados
+		//obtiene el total de resultados
 		$sql2 = new Sql($this->adapter);
 		$select = $sql2->select();
 		$select->from('resultados');
@@ -76,9 +76,24 @@ class PreguntasMapper
 		));
 		$selectString = $sql2->getSqlStringForSqlObject($select);
 		$results  = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
-		$encuestados = $results->toArray();
+		$resultados = $results->toArray();
+		$cantidadresultados = count($resultados);
 
-		$cantidadEncuestados = count($encuestados);
+		//obtiene el total de preguntas
+		$sql3 = new Sql($this->adapter);
+		$select = $sql3->select();
+		$select->from('preguntas');
+		$select->where(array(
+			'preguntas.empresa'  => $empresa,
+			'preguntas.encuesta' => $encuesta,
+		));
+		$selectString = $sql3->getSqlStringForSqlObject($select);
+		$results  = $this->adapter->query($selectString, Adapter::QUERY_MODE_EXECUTE);
+		$preguntas = $results->toArray();
+		$cantidadpreguntas = count($preguntas);
+
+		$cantidadEncuestados = $cantidadresultados/$cantidadpreguntas;
+
 
 		$json->success = true;
 		$json->cantidadEncuestados = $cantidadEncuestados;
